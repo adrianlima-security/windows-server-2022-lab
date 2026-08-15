@@ -1,4 +1,4 @@
-# Windows Server 2022 Cybersecurity Lab
+## Windows Server 2022 Cybersecurity Lab
 
 ## Overview
 
@@ -25,6 +25,7 @@ The main objectives of this laboratory are:
 * Apply the principle of least privilege.
 * Implement security groups and delegated administration.
 * Configure Group Policy Objects.
+* Establish a workstation security baseline.
 * Join a Windows 11 endpoint to the domain.
 * Generate and investigate Windows security events.
 * Integrate Active Directory security events with Wazuh.
@@ -64,7 +65,8 @@ Windows-Server-2022-Lab/
 ├── Docs/
 │   ├── 01-vm-creation.md
 │   ├── 02-windows-server-installation.md
-│   └── 03-active-directory-domain-services.md
+│   ├── 03-active-directory-domain-services.md
+│   └── 04-group-policy-security.md
 │
 └── Screenshots/
     ├── 01-first-server-desktop.png
@@ -82,7 +84,13 @@ Windows-Server-2022-Lab/
     ├── 13-ad-user-created.png
     ├── 14-user-group-membership.png
     ├── 15-soc-analysts-group.png
-    └── 16-ad-delegation-users-lab.png
+    ├── 16-ad-delegation-users-lab.png
+    ├── 17-gpo-workstations-linked.png
+    ├── 18-gpo-audit-logon-success-failure.png
+    ├── 19-gpo-account-lockout-policy.png
+    ├── 20-gpo-audit-policy-change.png
+    ├── 21-gpo-powershell-script-block-logging.png
+    └── 22-gpo-defender-behavior-monitoring.png
 ```
 
 Additional documentation and evidence will be added as the laboratory progresses.
@@ -129,6 +137,28 @@ This phase includes:
 * Delegation validation
 
 → [`03-active-directory-domain-services.md`](Docs/03-active-directory-domain-services.md)
+
+### Phase 4 — Group Policy Security
+
+Documents the creation and configuration of a workstation security baseline using Active Directory Group Policy.
+
+This phase includes:
+
+* Group Policy Management configuration
+* `GPO-Workstations-Security` creation
+* GPO linkage to the `Workstations` OU
+* Audit Logon configuration
+* Successful logon auditing
+* Failed logon auditing
+* Account Lockout Policy
+* Audit Audit Policy Change
+* PowerShell Script Block Logging
+* Microsoft Defender Behavior Monitoring
+* Centralized workstation security configuration
+* Defense-in-depth security controls
+* Security evidence collection
+
+→ [`04-group-policy-security.md`](Docs/04-group-policy-security.md)
 
 ---
 
@@ -210,6 +240,42 @@ The delegation was validated through a controlled password-reset operation perfo
 
 ---
 
+## Group Policy Security
+
+The workstation security baseline is managed centrally through:
+
+```text
+GPO-Workstations-Security
+```
+
+The GPO is associated with the:
+
+```text
+Workstations
+```
+
+OU.
+
+The purpose of this configuration is to ensure that Windows workstations receive a consistent security baseline after joining the domain.
+
+The following security controls have been configured:
+
+* Audit Logon
+* Successful logon auditing
+* Failed logon auditing
+* Account Lockout Policy
+* Audit Audit Policy Change
+* PowerShell Script Block Logging
+* Microsoft Defender Behavior Monitoring
+
+The GPO is currently configured on the Domain Controller.
+
+Full policy validation will occur after the Windows 11 client is created, joined to the domain, and placed in the `Workstations` OU.
+
+→ [`04-group-policy-security.md`](Docs/04-group-policy-security.md)
+
+---
+
 ## Virtualization
 
 The Windows Server environment is hosted in VMware Workstation Pro.
@@ -236,6 +302,8 @@ The laboratory will progressively incorporate defensive security practices inclu
 * PowerShell logging
 * System monitoring
 * Authentication monitoring
+* Account lockout protection
+* Microsoft Defender endpoint protection
 * Active Directory security event analysis
 * Detection engineering
 * Security event investigation
@@ -254,6 +322,7 @@ Examples include:
 
 * Multiple failed authentication attempts
 * Successful and failed logons
+* Account lockout events
 * User creation
 * User deletion
 * Password resets
@@ -273,25 +342,30 @@ These events will provide realistic telemetry for security monitoring and detect
 The final laboratory architecture is planned as:
 
 ```text
-                  Active Directory
-                    adlab.local
-                         │
-                         ▼
-                       DC01
-              Windows Server 2022
-                         │
-             Security Events / Logs
-                         │
-                         ▼
-                       Wazuh
-                         │
-                         ▼
-                Detection / Analysis
-                         │
-                         │
-                 Windows 11 Client
-                         │
-                         └── Domain Joined
+                    Active Directory
+                      adlab.local
+                           │
+                           ▼
+                         DC01
+                  Windows Server 2022
+                           │
+                    Workstations OU
+                           │
+                           ▼
+                       WIN11-01
+                    Windows 11 Client
+                           │
+                           ▼
+                GPO-Workstations-Security
+                           │
+                           ▼
+                    Security Controls
+                           │
+                           ▼
+                         Wazuh
+                           │
+                           ▼
+                  Detection / Analysis
 ```
 
 The architecture will be expanded as additional laboratory components are implemented.
@@ -317,8 +391,16 @@ Evidence currently includes:
 * Group membership
 * SOC-Analysts security group
 * Delegated administration configuration
+* GPO creation and linkage
+* Audit Logon configuration
+* Account Lockout configuration
+* Audit Policy Change configuration
+* PowerShell Script Block Logging configuration
+* Microsoft Defender Behavior Monitoring configuration
 
-The delegated administration functionality was also successfully validated through a controlled password-reset operation. No separate screenshot was captured for this validation.
+The delegated administration functionality was successfully validated through a controlled password-reset operation. No separate screenshot was captured for this validation.
+
+The Group Policy configuration has been documented with screenshots. Full workstation-side validation will be performed after the Windows 11 client is deployed.
 
 Sensitive information such as passwords, credentials, tokens, or other secrets will not be stored in the repository.
 
@@ -326,7 +408,7 @@ Sensitive information such as passwords, credentials, tokens, or other secrets w
 
 ## Status
 
-**Current status:** Active Directory Domain Services successfully deployed and configured.
+**Current status:** Active Directory Domain Services and initial workstation security baseline successfully deployed and configured.
 
 ### Completed
 
@@ -353,17 +435,37 @@ Sensitive information such as passwords, credentials, tokens, or other secrets w
 * [x] AD-Admins security group created
 * [x] Delegated administration configured
 * [x] Delegated administration successfully validated
-* [x] Phase 3 documentation created
+* [x] Group Policy Management configured
+* [x] `GPO-Workstations-Security` created
+* [x] GPO linked to `Workstations` OU
+* [x] Audit Logon configured
+* [x] Successful logon auditing enabled
+* [x] Failed logon auditing enabled
+* [x] Account Lockout Policy configured
+* [x] Account lockout threshold set to 5 attempts
+* [x] Account lockout duration set to 15 minutes
+* [x] Account lockout counter reset configured for 15 minutes
+* [x] Audit Audit Policy Change configured
+* [x] PowerShell Script Block Logging enabled
+* [x] Microsoft Defender Behavior Monitoring enabled
+* [x] Phase 4 documentation created
 
 ### In Progress
 
-* [ ] Configure Group Policy Objects
 * [ ] Create Windows 11 client virtual machine
+* [ ] Configure Windows 11 networking
+* [ ] Configure Windows 11 DNS
 * [ ] Join Windows 11 client to the domain
+* [ ] Place `WIN11-01` in the `Workstations` OU
+* [ ] Verify GPO application
 * [ ] Configure domain authentication
+* [ ] Verify audit events
+* [ ] Test account lockout behavior
+* [ ] Verify PowerShell Script Block Logging
+* [ ] Verify Microsoft Defender configuration
 * [ ] Configure security auditing
 * [ ] Generate controlled security events
-* [ ] Integrate Active Directory events with Wazuh
+* [ ] Integrate Windows security telemetry with Wazuh
 * [ ] Develop detection and monitoring use cases
 * [ ] Implement additional security controls
 
@@ -375,11 +477,11 @@ The laboratory will progressively evolve into a multi-system cybersecurity envir
 
 Future stages will include:
 
-1. Group Policy configuration
-2. Windows 11 domain client deployment
-3. Domain authentication testing
-4. Security auditing configuration
-5. Controlled attack and administrative scenarios
+1. Windows 11 domain client deployment
+2. Domain authentication testing
+3. Group Policy validation
+4. Security auditing validation
+5. Controlled security scenarios
 6. Wazuh integration
 7. Detection engineering
 8. Threat hunting
