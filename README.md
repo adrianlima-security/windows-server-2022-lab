@@ -521,3 +521,35 @@ This project is intended for educational and defensive cybersecurity purposes.
 All security testing and experimentation is performed within a controlled laboratory environment owned or administered by the author.
 
 No production systems or third-party environments are intentionally targeted as part of this project.
+## Remote Administration with PowerShell Remoting
+
+Configured and validated remote PowerShell access from the Windows host to the Windows Server 2022 domain controller (`DC01`) using WinRM over TCP port 5985.
+
+### Environment
+
+- **Domain Controller:** `DC01`
+- **Domain:** `adlab.local`
+- **Server IP:** `192.168.100.10`
+- **Remote management:** PowerShell Remoting (WinRM)
+
+### Connection
+
+```powershell
+$cred = Get-Credential
+Enter-PSSession -ComputerName 192.168.100.10 -Credential $cred
+```
+
+### Validation
+
+```powershell
+hostname
+Get-Service DNS, NTDS, WinRM
+```
+
+### Results
+
+Remote access was established successfully. The server hostname was confirmed as `DC01`, and the DNS, Active Directory Domain Services (`NTDS`), and WinRM services were verified as running.
+
+### Security Considerations
+
+Remote administration should be restricted to authorized accounts and trusted hosts. For production environments, use appropriate authentication and transport security controls.
