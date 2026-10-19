@@ -6,7 +6,7 @@ This project documents the deployment, configuration, and security implementatio
 
 The objective is to build a controlled Windows Server environment to practice system administration, networking, identity and access management, Active Directory, security monitoring, detection engineering, and defensive security techniques.
 
-The laboratory progressively evolves into an enterprise-style security environment with a Windows 11 domain client and planned Wazuh SIEM/XDR integration.
+The laboratory progressively evolves into an enterprise-style security environment with a Windows 11 domain client and Wazuh SIEM/XDR integration.
 
 All phases are documented with technical explanations and screenshots to demonstrate practical cybersecurity skills and support reproducibility.
 
@@ -36,11 +36,13 @@ Enable and verify PowerShell Script Block Logging.
 
 Investigate Windows security events.
 
-Integrate endpoint and Active Directory telemetry with Wazuh.
+Deploy Wazuh SIEM/XDR on Ubuntu Server.
+
+Integrate Windows endpoint and Active Directory telemetry with Wazuh.
 
 Develop and test defensive detection scenarios.
 
-Document the implementation and supporting evidence.
+Document implementation steps and supporting evidence.
 
 Lab Environment
 
@@ -120,9 +122,27 @@ Client Organizational Unit
 
 Workstations
 
-Planned SIEM/XDR
+SIEM/XDR Platform
 
 Wazuh
+
+SIEM Server OS
+
+Ubuntu Server 24.04 LTS
+
+SIEM Deployment
+
+Wazuh All-in-One
+
+SIEM Components
+
+Wazuh Indexer, Manager, Dashboard
+
+SIEM Virtual Disk
+
+60 GB
+
+The Wazuh server is deployed separately from the Windows Server domain controller. Centralized event collection from the Windows systems remains to be configured and validated.
 
 Project Structure
 
@@ -175,13 +195,13 @@ Phase 1 — Virtual Machine Creation
 
 Documents the creation and configuration of the Windows Server virtual machine in VMware Workstation Pro, including CPU, memory, storage, networking, installation media, and initial boot troubleshooting.
 
-→ 01-vm-creation.md
+Documentation: Docs/01-vm-creation.md
 
 Phase 2 — Windows Server Installation
 
 Documents the installation of Windows Server 2022 Standard with Desktop Experience, including disk selection, installation configuration, administrator setup, and first successful boot.
 
-→ 02-windows-server-installation.md
+Documentation: Docs/02-windows-server-installation.md
 
 Phase 3 — Active Directory Domain Services
 
@@ -189,39 +209,39 @@ Documents the configuration of the Windows Server environment as an Active Direc
 
 This phase includes:
 
-Server hostname configuration
+Server hostname configuration.
 
-Static IP and DNS configuration
+Static IP and DNS configuration.
 
-Active Directory Domain Services installation
+Active Directory Domain Services installation.
 
-Domain Controller promotion
+Domain Controller promotion.
 
-Active Directory forest creation
+Active Directory forest creation.
 
-Domain and NetBIOS configuration
+Domain and NetBIOS configuration.
 
-DNS verification
+DNS verification.
 
-Organizational Unit creation
+Organizational Unit creation.
 
-User account creation
+User account creation.
 
-Security group creation
+Security group creation.
 
-SOC-Analysts group configuration
+SOC-Analysts group configuration.
 
-Privileged account separation
+Privileged account separation.
 
-AD-Admins security group
+AD-Admins security group.
 
-Delegated administration
+Delegated administration.
 
-Least privilege implementation
+Least privilege implementation.
 
-Delegation validation
+Delegation validation.
 
-→ 03-active-directory-domain-services.md
+Documentation: Docs/03-active-directory-domain-services.md
 
 Phase 4 — Group Policy Security
 
@@ -229,27 +249,27 @@ Documents the creation and configuration of a centralized workstation security b
 
 This phase includes:
 
-Group Policy Management configuration
+Group Policy Management configuration.
 
-GPO-Workstations-Security creation
+GPO-Workstations-Security creation.
 
-GPO linkage to the Workstations OU
+GPO linkage to the Workstations OU.
 
-Successful and failed logon auditing
+Successful and failed logon auditing.
 
-Account Lockout Policy
+Account Lockout Policy.
 
-Audit Policy Change
+Audit Policy Change.
 
-PowerShell Script Block Logging
+PowerShell Script Block Logging.
 
-Microsoft Defender behavior monitoring
+Microsoft Defender behavior monitoring.
 
-Centralized workstation security configuration
+Centralized workstation security configuration.
 
-Security evidence collection
+Security evidence collection.
 
-→ 04-group-policy-security.md
+Documentation: Docs/04-group-policy-security.md
 
 Phase 5 — Windows 11 Domain Join and Security Validation
 
@@ -257,37 +277,39 @@ Documents the deployment of a Windows 11 Pro client and its integration into the
 
 This phase includes:
 
-Windows 11 virtual machine deployment
+Windows 11 virtual machine deployment.
 
-Windows 11 Pro installation
+Windows 11 Pro installation.
 
-Network connectivity verification
+Network connectivity verification.
 
-DNS configuration pointing to DC01
+DNS configuration pointing to DC01.
 
-Domain Controller connectivity testing
+Domain Controller connectivity testing.
 
-DNS resolution for adlab.local
+DNS resolution for adlab.local.
 
-Domain join verification
+Domain join verification.
 
-Computer account placement in the Workstations OU
+Computer account placement in the Workstations OU.
 
-Application of GPO-Workstations-Security
+Application of GPO-Workstations-Security.
 
-Verification of PowerShell Script Block Logging
+Verification of PowerShell Script Block Logging.
 
-Inspection of the PowerShell Operational event log
+Inspection of the PowerShell Operational event log.
 
-Validation of Event ID 4104
+Validation of Event ID 4104.
 
-Screenshot collection and technical documentation
+Screenshot collection and technical documentation.
 
 The client successfully joined the adlab.local domain. Its computer account, DESKTOP-HGSPMK5, was moved to the Workstations OU. Following a Group Policy refresh, GPO-Workstations-Security appeared in the client's computer policy results.
 
-The registry value EnableScriptBlockLogging was confirmed as 1, and events with ID 4104 were found in the Microsoft-Windows-PowerShell/Operational log.
+The registry value EnableScriptBlockLogging was confirmed as 1, and events with ID 4104 were observed in the Microsoft-Windows-PowerShell/Operational log.
 
-→ 05-windows11-domain-join.md
+These validations demonstrate that the relevant Group Policy settings were applied locally and that PowerShell script block logging events were generated.
+
+Documentation: Docs/05-windows11-domain-join.md
 
 Active Directory Environment
 
@@ -339,11 +361,11 @@ Administrative permissions were delegated to AD-Admins over the Users-Lab OU.
 
 Delegated capabilities include:
 
-Creating, deleting, and managing user accounts
+Creating, deleting, and managing user accounts.
 
-Resetting user passwords
+Resetting user passwords.
 
-Requiring a password change at the next logon
+Requiring a password change at the next logon.
 
 The delegation was validated through a controlled password-reset operation performed by maria.admin against a user in Users-Lab.
 
@@ -359,25 +381,25 @@ The GPO is linked to the Workstations OU.
 
 The configured security controls include:
 
-Audit Logon
+Audit Logon.
 
-Successful logon auditing
+Successful logon auditing.
 
-Failed logon auditing
+Failed logon auditing.
 
-Account Lockout Policy
+Account Lockout Policy.
 
-Audit Policy Change
+Audit Policy Change.
 
-PowerShell Script Block Logging
+PowerShell Script Block Logging.
 
-Microsoft Defender behavior monitoring
+Microsoft Defender behavior monitoring.
 
 The Windows 11 client was joined to adlab.local and placed in the Workstations OU. After a Group Policy refresh, the client reported GPO-Workstations-Security in its computer policy results.
 
 PowerShell Script Block Logging was validated by checking the registry configuration and inspecting the PowerShell Operational event log.
 
-These results demonstrate workstation-side GPO application and the generation of PowerShell script block logging events.
+These results demonstrate workstation-side Group Policy application and the generation of PowerShell script block logging events.
 
 Windows 11 Client Validation
 
@@ -403,7 +425,47 @@ Observation of Event ID 4104 in Microsoft-Windows-PowerShell/Operational.
 
 The VMware virtual machine is named WIN11-CLIENT-2. The computer account registered in Active Directory is DESKTOP-HGSPMK5.
 
-The Windows client has not yet been integrated with Wazuh. Centralized event collection and detection validation remain future tasks.
+The Windows client has not yet been integrated with Wazuh. Centralized event collection and detection validation remain pending.
+
+Wazuh SIEM/XDR Integration
+
+Wazuh has been installed on an Ubuntu Server 24.04 LTS virtual machine as an All-in-One deployment.
+
+The deployment includes:
+
+Wazuh Indexer.
+
+Wazuh Manager.
+
+Wazuh Dashboard.
+
+The Wazuh dashboard is accessible, confirming that the platform has been deployed and its web interface is available.
+
+The Windows Server 2022 domain controller and Windows 11 domain client have not yet been integrated with the Wazuh manager.
+
+Planned Integration Tasks
+
+Verify the status of Wazuh services.
+
+Confirm network connectivity between the Wazuh server and Windows systems.
+
+Install and configure the Wazuh agent on Windows 11.
+
+Install and configure the Wazuh agent on DC01.
+
+Verify agent registration and connectivity.
+
+Confirm centralized collection of Windows security events.
+
+Validate PowerShell event collection.
+
+Generate controlled authentication and account-management events.
+
+Investigate alerts in the Wazuh dashboard.
+
+Develop and document detection use cases.
+
+The integration will connect the existing Windows security configuration to centralized monitoring and detection.
 
 Virtualization and Networking
 
@@ -411,71 +473,77 @@ The Windows Server environment is hosted in VMware Workstation Pro using a NAT n
 
 The Windows 11 client uses DC01 as its preferred DNS server to resolve the Active Directory domain.
 
+The Wazuh server runs on a separate Ubuntu Server virtual machine. Network communication between the SIEM and the Windows systems must be verified during the integration phase.
+
 The lab is intended for controlled testing and defensive security exercises, separate from production systems.
 
 Security Focus
 
 The laboratory progressively incorporates defensive security practices, including:
 
-Active Directory security
+Active Directory security.
 
-Identity and access management
+Identity and access management.
 
-Least privilege
+Least privilege.
 
-Privileged account separation
+Privileged account separation.
 
-Group Policy security
+Group Policy security.
 
-Windows endpoint hardening
+Windows endpoint hardening.
 
-Firewall configuration
+Firewall configuration.
 
-Event logging and auditing
+Event logging and auditing.
 
-PowerShell script logging
+PowerShell script logging.
 
-Authentication monitoring
+Authentication monitoring.
 
-Account lockout protection
+Account lockout protection.
 
-Microsoft Defender endpoint protection
+Microsoft Defender endpoint protection.
 
-Active Directory security event analysis
+Active Directory security event analysis.
 
-Detection engineering
+Centralized log collection.
 
-Security event investigation
+SIEM monitoring.
 
-Wazuh SIEM/XDR integration
+Detection engineering.
+
+Security event investigation.
+
+Threat hunting.
 
 Planned Security Detection Scenarios
 
-Once centralized monitoring is implemented, the laboratory will be used to generate controlled security events for investigation and detection development.
+Once centralized monitoring is implemented, the lab will be used to generate controlled security events for investigation and detection development.
 
 Planned scenarios include:
 
-Multiple failed authentication attempts
+Multiple failed authentication attempts.
 
-Successful and failed logons
+Successful and failed logons.
 
-Account lockout events
+Account lockout events.
 
-User creation and deletion
+User creation and deletion.
 
-Password resets
+Password resets.
 
-Group membership changes
+Group membership changes.
 
-Privilege changes
+Privilege changes.
 
-Administrative activity
+Administrative activity.
 
-PowerShell execution
+PowerShell execution.
 
-Group Policy modifications
+Group Policy modifications.
 
-Other Active Directory administrative activity
+Other Active Directory administrative activity.
 
 These scenarios will provide telemetry for security monitoring and detection engineering.
 
@@ -502,12 +570,15 @@ Planned Architecture
              Windows Event Logs
                       |
                       v
-           Planned Wazuh Integration
+              Wazuh Agents
+                      |
+                      v
+              Wazuh Manager
                       |
                       v
              Detection and Analysis
 
-The architecture will expand as additional components are implemented and validated.
+The diagram represents the intended monitoring architecture. Agent deployment, centralized event collection, and detection validation are still pending.
 
 Evidence
 
@@ -515,175 +586,189 @@ Screenshots documenting significant configuration and validation steps are store
 
 Evidence includes:
 
-Windows Server installation
+Windows Server installation.
 
-Hostname and static IP configuration
+Hostname and static IP configuration.
 
-Active Directory Domain Services installation
+Active Directory Domain Services installation.
 
-Domain Controller promotion
+Domain Controller promotion.
 
-Active Directory domain configuration
+Active Directory domain configuration.
 
-Organizational Unit structure
+Organizational Unit structure.
 
-User and security group creation
+User and security group creation.
 
-Delegated administration configuration
+Delegated administration configuration.
 
-Group Policy creation and linkage
+Group Policy creation and linkage.
 
-Audit Logon configuration
+Audit Logon configuration.
 
-Account Lockout configuration
+Account Lockout configuration.
 
-Audit Policy Change configuration
+Audit Policy Change configuration.
 
-PowerShell Script Block Logging configuration
+PowerShell Script Block Logging configuration.
 
-Microsoft Defender behavior monitoring configuration
+Microsoft Defender behavior monitoring configuration.
 
-Windows 11 virtual machine configuration and installation
+Windows 11 virtual machine configuration and installation.
 
-Connectivity between Windows 11 and DC01
+Connectivity between Windows 11 and DC01.
 
-DNS resolution for the domain
+DNS resolution for the domain.
 
-Windows 11 domain join
+Windows 11 domain join.
 
-Workstation GPO application
+Workstation GPO application.
 
-PowerShell Script Block Logging registry configuration
+PowerShell Script Block Logging registry configuration.
 
-PowerShell Operational Event ID 4104
+PowerShell Operational Event ID 4104.
+
+Additional screenshots will be collected during Wazuh agent deployment, event collection validation, and detection testing.
 
 The screenshots provide supporting evidence for the steps described in the phase documentation.
 
-Sensitive information such as passwords, credentials, tokens, and other secrets must not be committed to the repository.
+Sensitive information such as passwords, credentials, tokens, private keys, and other secrets must not be committed to the repository.
 
 Status
 
-Current status: Active Directory and the Windows 11 domain client are configured. Workstation GPO application and PowerShell script block logging have been validated locally.
+Current status: Active Directory and the Windows 11 domain client are configured. Workstation Group Policy application and PowerShell Script Block Logging have been validated locally. Wazuh is installed on Ubuntu Server, and its dashboard is accessible. Integration between Wazuh and the Windows systems remains pending.
 
 Completed
 
-VMware virtual machine created
+VMware virtual machine created.
 
-Windows Server 2022 Standard installed
+Windows Server 2022 Standard installed.
 
-Desktop Experience installed
+Desktop Experience installed.
 
-Administrator account configured
+Administrator account configured.
 
-Server hostname configured
+Server hostname configured.
 
-Static IP and DNS configured
+Static IP and DNS configured.
 
-Active Directory Domain Services installed
+Active Directory Domain Services installed.
 
-Domain Controller promotion completed
+Domain Controller promotion completed.
 
-adlab.local forest and domain configured
+adlab.local forest and domain configured.
 
-NetBIOS domain name configured
+NetBIOS domain name configured.
 
-DNS resolution verified
+DNS resolution verified.
 
-Organizational Units created
+Organizational Units created.
 
-Standard user account created
+Standard user account created.
 
-SOC-Analysts security group created
+SOC-Analysts security group created.
 
-Privileged administrative account created
+Privileged administrative account created.
 
-AD-Admins security group created
+AD-Admins security group created.
 
-Delegated administration configured and validated
+Delegated administration configured and validated.
 
-GPO-Workstations-Security created
+GPO-Workstations-Security created.
 
-GPO linked to the Workstations OU
+GPO linked to the Workstations OU.
 
-Audit Logon configured
+Audit Logon configured.
 
-Successful and failed logon auditing enabled
+Successful and failed logon auditing enabled.
 
-Account Lockout Policy configured
+Account Lockout Policy configured.
 
-Account lockout threshold set to 5 attempts
+Account lockout threshold set to 5 attempts.
 
-Account lockout duration set to 15 minutes
+Account lockout duration set to 15 minutes.
 
-Account lockout counter reset configured for 15 minutes
+Account lockout counter reset configured for 15 minutes.
 
-Audit Policy Change configured
+Audit Policy Change configured.
 
-PowerShell Script Block Logging configured
+PowerShell Script Block Logging configured.
 
-Microsoft Defender behavior monitoring configured
+Microsoft Defender behavior monitoring configured.
 
-Windows 11 Pro client deployed
+Windows 11 Pro client deployed.
 
-Windows 11 connectivity to DC01 verified
+Windows 11 connectivity to DC01 verified.
 
-DNS resolution for adlab.local verified
+DNS resolution for adlab.local verified.
 
-Windows 11 client joined to the domain
+Windows 11 client joined to the domain.
 
-Client computer account moved to the Workstations OU
+Client computer account moved to the Workstations OU.
 
-Workstation GPO application verified
+Workstation GPO application verified.
 
-PowerShell Script Block Logging registry value verified
+PowerShell Script Block Logging registry value verified.
 
-PowerShell Operational Event ID 4104 observed
+PowerShell Operational Event ID 4104 observed.
 
-Phase 5 documentation and screenshots collected
+Phase 5 documentation and screenshots collected.
+
+Wazuh All-in-One deployed on Ubuntu Server.
+
+Wazuh dashboard accessed successfully.
 
 In Progress / Planned
 
-Verify domain authentication scenarios
+Verify domain authentication scenarios.
 
-Test account lockout behavior
+Test account lockout behavior.
 
-Verify Microsoft Defender configuration on the client
+Verify Microsoft Defender configuration on the client.
 
-Generate additional controlled security events
+Generate additional controlled security events.
 
-Configure the Wazuh manager and agent integration
+Configure the Wazuh agent on Windows 11.
 
-Verify centralized Windows event collection
+Configure the Wazuh agent on DC01.
 
-Develop detection and monitoring use cases
+Verify agent connectivity and status.
 
-Investigate collected security events
+Verify centralized Windows event collection.
 
-Implement additional security controls
+Validate PowerShell event collection in Wazuh.
+
+Develop detection and monitoring use cases.
+
+Investigate collected security events.
+
+Implement additional security controls.
+
+Document Wazuh alerts and detection results.
 
 Future Lab Development
 
 Future stages will include:
 
-Domain authentication testing
+Domain authentication testing.
 
-Additional Group Policy validation
+Additional Group Policy validation.
 
-Security auditing validation
+Security auditing validation.
 
-Controlled security scenarios
+Controlled security scenarios.
 
-Wazuh integration
+Wazuh agent integration.
 
-Centralized log collection
+Centralized log collection.
 
-Detection engineering
+Detection engineering.
 
-Threat hunting
+Threat hunting.
 
-Security event investigation
+Security event investigation.
 
-Documentation of detection use cases
+Documentation of detection use cases.
 
 The final objective is to demonstrate an end-to-end defensive security workflow:
 
@@ -696,7 +781,7 @@ Security Event
 Log Collection
      |
      v
-Wazuh
+Wazuh SIEM
      |
      v
 Detection
@@ -732,8 +817,13 @@ hostname
 Get-Service DNS, NTDS, WinRM
 
 The remote session was previously used to confirm the server hostname and inspect the status of DNS, Active Directory Domain Services (NTDS), and WinRM.
+
 Remote administration should be restricted to authorized accounts and trusted hosts. Production environments require appropriate authentication, access restrictions, and transport security.
+
 Disclaimer
+
 This project is intended for educational and defensive cybersecurity purposes.
+
 All security testing and experimentation is performed within a controlled laboratory environment owned or administered by the author.
+
 No production systems or third-party environments are intentionally targeted as part of this project.
